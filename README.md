@@ -1,132 +1,286 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Thundera TV API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API backend do Thundera TV, desenvolvida com NestJS, Prisma e PostgreSQL. Responsável por autenticação, usuários, planos, assinaturas, pagamentos, controle de acesso ao stream e administração.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Tecnologias
 
-## Description
+- [NestJS 12](https://docs.nestjs.com/) — framework backend
+- [Prisma 7](https://www.prisma.io/) — ORM e migrations
+- [PostgreSQL 16](https://www.postgresql.org/) — banco de dados
+- JWT e Passport — autenticação
+- bcryptjs — hash de senhas e refresh tokens
+- class-validator — validação dos DTOs
+- Jest e Supertest — testes
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Funcionalidades
 
-## Project setup
+- Cadastro, login, logout e renovação de sessão
+- Perfil do usuário e gerenciamento de dispositivos
+- Planos e assinaturas
+- Registro e consulta de pagamentos
+- Validação de acesso ao conteúdo de stream
+- Informações sobre a versão do aplicativo
+- Endpoints administrativos
 
-```bash
-$ npm install
-```
+## Pré-requisitos
 
-## Compile and run the project
+- Node.js 20.19+ ou 22.12+
+- npm
+- PostgreSQL 16 ou Docker
+
+## Instalação
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
+## Configuração
+
+Crie um arquivo `.env` na raiz do projeto:
+
+```env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/thundera?schema=public"
+JWT_SECRET="substitua-por-uma-chave-segura"
+PORT=3000
+```
+
+| Variável | Obrigatória | Descrição |
+| --- | --- | --- |
+| `DATABASE_URL` | Sim | URL de conexão com PostgreSQL |
+| `JWT_SECRET` | Sim em produção | Chave usada para assinar access e refresh tokens |
+| `PORT` | Não | Porta da API; padrão `3000` |
+
+> Quando `JWT_SECRET` não é informado, a aplicação usa `development-secret-key`. Não use esse valor em produção.
+
+## Banco de dados
+
+### Com Docker
+
+Inicie o PostgreSQL configurado pelo projeto:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+docker compose up -d postgres
 ```
 
-## Deployment
+O banco ficará disponível em `localhost:5432` com:
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+- Banco: `thundera`
+- Usuário: `postgres`
+- Senha: `postgres`
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Migrations
+
+Aplique as migrations existentes:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npx prisma migrate deploy
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Observability
-
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
-
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-To add it to this project, run this and approve the code it prints at [observe.nestjs.com/link](https://observe.nestjs.com/link) - signing up for free if you have no account:
+Para desenvolvimento, use:
 
 ```bash
-$ npx @nestjs/observe link
+npx prisma migrate dev
 ```
 
-It installs `@nestjs/observe`, wires it into `AppModule` and `main.ts`, and writes the app key and secret into `.env`, which every `nest start` script (`start`, `start:dev`, `start:debug`) then loads. In production, set `OBSERVE_APP_KEY` and `OBSERVE_APP_SECRET` in the environment instead.
-
-Or do it by hand:
+Para abrir o Prisma Studio:
 
 ```bash
-$ npm install @nestjs/observe
+npx prisma studio
 ```
 
-Then follow the [setup guide](https://docs.nestjs.com/observability/sdk) - it takes a single import and an app key.
+## Executando a aplicação
 
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
+```bash
+# desenvolvimento
+npm run start
 
-## Resources
+# desenvolvimento com hot reload
+npm run start:dev
 
-Check out a few resources that may come in handy when working with NestJS:
+# modo debug
+npm run start:debug
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+# build
+npm run build
 
-## Support
+# build compilado
+npm run start:prod
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+A API será iniciada em `http://localhost:3000` por padrão.
 
-## Stay in touch
+## Endpoints
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Os endpoints públicos e protegidos abaixo são relativos à porta configurada em `PORT`.
 
-## License
+### Geral
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+| Método | Rota | Autenticação | Descrição |
+| --- | --- | --- | --- |
+| `GET` | `/` | Não | Status simples da aplicação |
+| `GET` | `/app-version/latest` | Não | Retorna a versão mais recente disponível |
+
+### Autenticação
+
+| Método | Rota | Autenticação | Descrição |
+| --- | --- | --- | --- |
+| `POST` | `/auth/register` | Não | Cadastra um usuário |
+| `POST` | `/auth/login` | Não | Autentica e gera os tokens |
+| `POST` | `/auth/refresh` | Não | Renova o access token |
+| `POST` | `/auth/logout` | Bearer token | Revoga refresh tokens e, opcionalmente, um dispositivo |
+| `GET` | `/auth/me` | Bearer token | Retorna o perfil autenticado |
+
+Exemplo de cadastro:
+
+```json
+{
+  "name": "Nome do usuário",
+  "email": "usuario@email.com",
+  "password": "senha123",
+  "deviceId": "device-id-opcional",
+  "platform": "android"
+}
+```
+
+Exemplo de login:
+
+```json
+{
+  "email": "usuario@email.com",
+  "password": "senha123",
+  "deviceId": "device-id-opcional",
+  "platform": "android"
+}
+```
+
+Endpoints protegidos recebem o header:
+
+```http
+Authorization: Bearer <accessToken>
+```
+
+### Usuários, planos e assinaturas
+
+| Método | Rota | Autenticação | Descrição |
+| --- | --- | --- | --- |
+| `GET` | `/users/me` | Bearer token | Perfil do usuário |
+| `GET` | `/plans` | Não | Lista os planos |
+| `GET` | `/plans/:id` | Não | Consulta um plano |
+| `POST` | `/plans` | Bearer token | Cria um plano |
+| `GET` | `/subscriptions/me` | Bearer token | Lista as assinaturas do usuário |
+| `POST` | `/subscriptions` | Bearer token | Cria uma assinatura para o usuário autenticado |
+
+Exemplo de criação de plano:
+
+```json
+{
+  "name": "Mensal",
+  "description": "Acesso mensal",
+  "price": 29.9,
+  "durationDays": 30
+}
+```
+
+Exemplo de criação de assinatura:
+
+```json
+{
+  "planId": "uuid-do-plano"
+}
+```
+
+### Pagamentos, stream e administração
+
+| Método | Rota | Autenticação | Descrição |
+| --- | --- | --- | --- |
+| `GET` | `/payments/me` | Bearer token | Lista os pagamentos do usuário |
+| `POST` | `/payments/webhook` | Não | Atualiza o status de um pagamento |
+| `POST` | `/stream/check` | Bearer token | Verifica o acesso a um conteúdo |
+| `GET` | `/admin/users` | Bearer token | Lista usuários |
+| `GET` | `/admin/subscriptions` | Bearer token | Lista assinaturas |
+| `GET` | `/admin/payments` | Bearer token | Lista pagamentos |
+| `GET` | `/admin/stats` | Bearer token | Retorna estatísticas gerais |
+| `PATCH` | `/admin/users/:id/status` | Bearer token | Atualiza o status de um usuário |
+
+Exemplo do webhook de pagamento:
+
+```json
+{
+  "externalReference": "referencia-do-pagamento",
+  "status": "PAID",
+  "provider": "provider-name"
+}
+```
+
+Status aceitos: `PENDING`, `PAID`, `FAILED` e `REFUNDED`.
+
+Exemplo de verificação de stream:
+
+```json
+{
+  "contentId": "conteudo-123"
+}
+```
+
+Exemplo de atualização de status administrativo:
+
+```json
+{
+  "status": true
+}
+```
+
+## Validação
+
+A API usa `ValidationPipe` global com:
+
+- Remoção de propriedades não declaradas no DTO
+- Bloqueio de campos não permitidos
+- Conversão automática dos valores
+
+Requisições inválidas retornam erro HTTP `400` com os detalhes da validação.
+
+## Testes
+
+```bash
+# testes unitários
+npm run test
+
+# testes unitários em modo watch
+npm run test:watch
+
+# cobertura
+npm run test:cov
+
+# testes end-to-end
+npm run test:e2e
+
+# lint
+npm run lint
+
+# formatar código
+npm run format
+```
+
+## Estrutura
+
+```text
+src/
+├── admin/           # Administração
+├── app-version/     # Versão atual do aplicativo
+├── auth/            # Autenticação, JWT e dispositivos
+├── payments/        # Pagamentos e webhook
+├── plans/           # Planos
+├── prisma/          # Integração com PostgreSQL
+├── stream/          # Verificação de acesso ao stream
+├── subscriptions/   # Assinaturas
+└── users/           # Perfil e dados do usuário
+```
+
+## Observabilidade
+
+A aplicação ainda não registra o NestJS Observe. Para ambientes de produção, recomenda-se integrar o módulo oficial antes do deploy.
+
+## Licença
+
+Projeto privado — uso interno.
