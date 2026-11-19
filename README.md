@@ -25,13 +25,13 @@ API backend do Thundera TV, desenvolvida com NestJS, Prisma e PostgreSQL. Respon
 ## Pré-requisitos
 
 - Node.js 20.19+ ou 22.12+
-- npm
+- Yarn 1.22.22
 - PostgreSQL 16 ou Docker
 
 ## Instalação
 
 ```bash
-npm install
+yarn install --frozen-lockfile
 ```
 
 ## Configuração
@@ -73,38 +73,38 @@ O banco ficará disponível em `localhost:5432` com:
 Aplique as migrations existentes:
 
 ```bash
-npx prisma migrate deploy
+yarn prisma migrate deploy
 ```
 
 Para desenvolvimento, use:
 
 ```bash
-npx prisma migrate dev
+yarn prisma migrate dev
 ```
 
 Para abrir o Prisma Studio:
 
 ```bash
-npx prisma studio
+yarn prisma studio
 ```
 
 ## Executando a aplicação
 
 ```bash
 # desenvolvimento
-npm run start
+yarn start
 
 # desenvolvimento com hot reload
-npm run start:dev
+yarn start:dev
 
 # modo debug
-npm run start:debug
+yarn start:debug
 
 # build
-npm run build
+yarn build
 
 # build compilado
-npm run start:prod
+yarn start:prod
 ```
 
 A API será iniciada em `http://localhost:3000` por padrão.
@@ -244,22 +244,22 @@ Requisições inválidas retornam erro HTTP `400` com os detalhes da validação
 
 ```bash
 # testes unitários
-npm run test
+yarn test
 
 # testes unitários em modo watch
-npm run test:watch
+yarn test:watch
 
 # cobertura
-npm run test:cov
+yarn test:cov
 
 # testes end-to-end
-npm run test:e2e
+yarn test:e2e
 
 # lint
-npm run lint
+yarn lint
 
 # formatar código
-npm run format
+yarn format
 ```
 
 ## Estrutura
