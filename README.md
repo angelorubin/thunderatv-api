@@ -196,11 +196,43 @@ Exemplo de criação de assinatura:
 | `GET` | `/payments/me` | Bearer token | Lista os pagamentos do usuário |
 | `POST` | `/payments/webhook` | Não | Atualiza o status de um pagamento |
 | `POST` | `/stream/check` | Bearer token | Verifica o acesso a um conteúdo |
-| `GET` | `/admin/users` | Bearer token | Lista usuários |
-| `GET` | `/admin/subscriptions` | Bearer token | Lista assinaturas |
-| `GET` | `/admin/payments` | Bearer token | Lista pagamentos |
-| `GET` | `/admin/stats` | Bearer token | Retorna estatísticas gerais |
-| `PATCH` | `/admin/users/:id/status` | Bearer token | Atualiza o status de um usuário |
+| `GET` | `/admin/users` | Bearer + `admin.users.read` | Lista usuários |
+| `GET` | `/admin/subscriptions` | Bearer + `admin.subscriptions.read` | Lista assinaturas |
+| `GET` | `/admin/payments` | Bearer + `admin.payments.read` | Lista pagamentos |
+| `GET` | `/admin/stats` | Bearer + `admin.stats.read` | Retorna estatísticas gerais |
+| `PATCH` | `/admin/users/:id/status` | Bearer + `admin.users.status.update` | Atualiza o status de um usuário |
+| `PATCH` | `/admin/users/:id/role` | Bearer + `admin.users.role.update` | Define o papel USER ou ADMIN |
+| `GET` | `/admin/roles/:role/permissions` | Bearer + `authorization.permissions.read` | Consulta permissões de um papel |
+| `PUT` | `/admin/roles/:role/permissions` | Bearer + `authorization.permissions.manage` | Substitui permissões de USER ou ADMIN |
+
+As permissões são associadas a papéis no banco. `ADMIN` recebe permissões operacionais; apenas `SUPER_ADMIN` pode alterar a matriz ou promover usuários. A API não permite alterar as permissões de `SUPER_ADMIN`, atribuir o papel `SUPER_ADMIN` ou delegar as permissões `admin.users.role.update` e `authorization.permissions.manage`.
+
+Para substituir as permissões de `ADMIN`, envie ao endpoint `PUT /admin/roles/ADMIN/permissions`:
+
+```json
+{
+  "permissions": ["admin.users.read", "admin.users.status.update"]
+}
+```
+
+Para promover um usuário existente, um `SUPER_ADMIN` pode enviar `PATCH /admin/users/:id/role` com:
+
+```json
+{
+  "role": "ADMIN"
+}
+```
+
+Para criar o primeiro `SUPER_ADMIN`, cadastre a conta normalmente e altere o papel por uma conexão administrativa segura ao banco:
+
+```sql
+UPDATE "User"
+SET "role" = 'SUPER_ADMIN'::"UserRole"
+WHERE "email" = lower('admin@seudominio.com')
+RETURNING "id", "email", "role";
+```
+
+Confirme que a conta retornada é a esperada. Depois, use essa conta para promover usuários a `ADMIN` e administrar as permissões dos papéis `USER` e `ADMIN`. As chaves de permissões aceitas pela API são definidas no código; adicionar uma chave nova requer uma alteração de código e migration, mas mudar quais papéis recebem as permissões existentes não exige deploy.
 
 Exemplo do webhook de pagamento:
 

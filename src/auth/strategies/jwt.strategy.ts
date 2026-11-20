@@ -13,7 +13,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET') || 'development-secret-key',
+      secretOrKey:
+        configService.get<string>('JWT_SECRET') || 'development-secret-key',
     });
   }
 
@@ -26,11 +27,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('Token inválido.');
     }
 
+    const rolePermissions = await this.prisma.rolePermission.findMany({
+      where: { role: user.role },
+      select: { permissionKey: true },
+    });
+
     return {
       sub: user.id,
       email: user.email,
       role: user.role,
       name: user.name,
+      permissions: rolePermissions.map(({ permissionKey }) => permissionKey),
     };
   }
 }
