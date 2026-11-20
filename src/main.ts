@@ -23,11 +23,15 @@ async function findAvailablePort(preferredPort: number): Promise<number> {
     }
   }
 
-  throw new Error(`Nenhuma porta disponível entre ${preferredPort} e ${preferredPort + 99}.`);
+  throw new Error(
+    `Nenhuma porta disponível entre ${preferredPort} e ${preferredPort + 99}.`,
+  );
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['log', 'fatal', 'error', 'warn', 'debug', 'verbose'],
+  });
 
   app.enableCors();
   app.useGlobalPipes(
